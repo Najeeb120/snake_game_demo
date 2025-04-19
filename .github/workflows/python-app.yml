@@ -1,0 +1,38 @@
+name: Test Snake Game Locally and on Runner
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Snake Game on Ubuntu Runner
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Snake Game (Headless Mode)
+      run: |
+        source venv/bin/activate
+        nohup python3 app.py > output.log 2>&1 &
+        echo "✅ Snake Game started on GitHub runner (background process)"
+
+    - name: Check if running
+      run: |
+        ps aux | grep python3
+        cat output.log || true
